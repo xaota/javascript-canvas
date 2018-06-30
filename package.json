@@ -1,0 +1,27 @@
+{
+  "name": "javascript-canvas",
+  "version": "1.0.0",
+  "description": "рисование для Canvas API @2d",
+  "main": "index.js",
+  "dependencies": {
+    "javascript-algebra": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xaota/javascript-canvas.git"
+  },
+  "keywords": [
+    "javascript",
+    "canvas"
+  ],
+  "author": "https://github.com/xaota",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/xaota/javascript-canvas/issues"
+  },
+  "homepage": "https://github.com/xaota/javascript-canvas#readme"
+}
