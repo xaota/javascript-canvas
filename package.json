@@ -1,7 +1,7 @@
 {
   "name": "javascript-canvas",
-  "version": "1.0.0",
-  "description": "рисование для Canvas API @2d",
+  "version": "1.0.1",
+  "description": "Рисование с помощью Canvas API @2d",
   "main": "index.js",
   "dependencies": {
     "javascript-algebra": "^1.0.0"
