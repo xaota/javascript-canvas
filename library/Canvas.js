@@ -104,12 +104,16 @@
       return this;
     }
 
-  /** Перенос начала координат в центр холста @relative */
+  /** Перенос начала координат в центр холста @relative
+    * @return {Canvas} this
+    */
     center() {
       return this.TO(this.CENTER);
     }
 
-  /** Перенос начала координат в центр холста @absolute */
+  /** Перенос начала координат в центр холста @absolute
+    * @return {Canvas} this
+    */
     basis() {
       return this.reset().center();
     }
@@ -120,13 +124,17 @@
       return this.transform(A.x, B.x, A.y, B.y, 1, 1);
     }
 
-  /** Помещение пера на холст */
+  /** Помещение пера на холст
+    * @return {Canvas} this
+    */
     begin() {
       this.context.beginPath();
       return this;
     }
 
-  /** Сохранение текущего состояния холста */
+  /** Сохранение текущего состояния холста
+    * @return {Canvas} this
+    */
     save() {
       this.context.save();
       this.stack.push({
@@ -136,7 +144,9 @@
       return this;
     }
 
-  /** Возврат к предыдущему состоянию холста */
+  /** Возврат к предыдущему состоянию холста
+    * @return {Canvas} this
+    */
     restore() {
       this.context.restore();
       const last = this.stack.pop();
@@ -165,7 +175,9 @@
       return this;
     }
 
-  /** Рисование контура */
+  /** Рисование контура
+    * @return {Canvas} this
+    */
     stroke() {
       this.context.stroke();
       return this;
@@ -189,7 +201,9 @@
       return this.style({stroke: color}).strokePath(path).style({stroke: last});
     }
 
-  /** Заливка */
+  /** Заливка
+    * @return {Canvas} this
+    */
     fill() {
       this.context.fill();
       return this;
@@ -341,7 +355,9 @@
       return this.clr(this.pointer, vector);
     }
 
-  /** Очистка всего холста */
+  /** Очистка всего холста
+    * @return {Canvas} this
+    */
     CLEAR() {
       const A = this.coord(Vector.zero);
       const B = this.VIEW;
@@ -389,12 +405,16 @@
       return this.SCALE(Vector.from(value, value));
     }
 
-  /** Перевороты */
+  /** Перевороты
+    * @return {Canvas} this
+    */
     flipX() { // горизонталь
       return this.scale(Vector.flipX);
     }
 
-  /** */
+  /**
+    * @return {Canvas} this
+    */
     flipY() { // вертикаль
       return this.scale(Vector.flipY);
     }
@@ -416,7 +436,9 @@
       return this.TRANSFORM(m[0], vector.x, vector.y, m[4], m[6], m[7]);
     }
 
-  /** Вектор коэффициентов искажения */
+  /** Вектор коэффициентов искажения
+    * @return {Canvas} this
+    */
     get skewVector() {
       const x = this.matrix.get(1, 0),
             y = this.matrix.get(0, 1);
@@ -475,7 +497,9 @@
       return this.TRANSLATE(vector).MOVE(Vector.zero);
     }
 
-  /** Сброс параметров холста */
+  /** Сброс параметров холста
+    * @return {Canvas} this
+    */
     reset() {
       this.stack  = []; // transforms
       this.matrix = Matrix.identity(3);
@@ -483,7 +507,9 @@
       return super.reset();
     }
 
-  /** */
+  /**
+    * @return {Canvas} this
+    */
     init() {
       const width = this.context.canvas.width,
          height = this.context.canvas.height,
@@ -597,6 +623,7 @@
     strokeText(string, width) {
       return this.STROKETEXT(string, this.pointer, width);
     }
+
     StrokeText(string, point, width) {
       point = this.pointer.addition(point);
       return this.STROKETEXT(string, point, width);

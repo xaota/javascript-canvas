@@ -181,12 +181,16 @@ export default class Context {
       return this;
     }
 
-  /** Сброс параметров */
+  /** Сброс параметров
+    * @return {Canvas} this
+    */
     reset() {
       return this.MOVE(Vector.zero);
     }
 
-  /** Поднятие пера */
+  /** Поднятие пера
+    * @return {Canvas} this
+    */
     end() {
       this.context.closePath();
       return this;
