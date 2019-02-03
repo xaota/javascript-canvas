@@ -1,6 +1,6 @@
 /** @section @imports */
   import Context          from './Context.js';
-  import {Vector, Matrix} from 'javascript-algebra';
+  import {Vector, Matrix} from '/javascript-algebra/index.js';
 
 /** @section @exports */
 /** {Canvas} Рисование на холсте @export @class @default */
@@ -15,10 +15,12 @@
       this.reset();
     }
 
+  /** */
     get SIZE() {
       return this._SIZE;
     }
 
+  /** */
     get VIEW() {
       // let vector = [
       //   this.context.canvas.width,
@@ -28,6 +30,7 @@
       return this._VIEW;
     }
 
+  /** */
     get PORT() {
       return {
         size: this.SIZE,
@@ -35,10 +38,12 @@
       }
     }
 
+  /** */
     get HARD() {
       return this.VIEW.multiplication(this.SIZE.link());
     }
 
+  /** */
     get CENTER() {
       return this.VIEW.scale(0.5);
     }
@@ -80,15 +85,15 @@
     }
 
   /** Перевод абсолютных координат в координаты окружения пера */
-    coord(vector) { // AB = X
-      vector = vector.reverse().resize(3).fill(2, 1);
-      return this.matrix.vectorCol(vector).vector().resize(2).reverse();
+    coord(vector) { // AX = B => X = inverse(A) B
+      vector = vector.resize(3).fill(2, 1);
+      return this.matrix.inverse().vectorCol(vector).vector().resize(2);
     }
 
-  /** Перевод координат из окружения пера в абсолютные */
-    origin(vector) { // AX = B => X = inverse(A) B
-      vector = vector.reverse().resize(3).fill(2, 1);
-      return this.matrix.inverse().vectorCol(vector).vector().resize(2).reverse();
+  /** Перевод координат из окружения пера в абсолютные (?) */
+    origin(vector) { // AB = X
+      vector = vector.resize(3).fill(2, 1);
+      return this.matrix.vectorCol(vector).vector().resize(2);
     }
 
   /** Перевод точек из одной СК окружения пера в другую через матрицу перехода */
@@ -99,8 +104,8 @@
 
   /** Преобразование СК с переносом пера */
     trans(matrix) {
-      this.matrix  = this.matrix.multiply(matrix);
-      this.pointer = Canvas.trans(this.pointer, matrix);
+      this.matrix = this.matrix.multiply(matrix);
+      // this.pointer = Canvas.trans(this.pointer, matrix);
       return this;
     }
 
@@ -228,13 +233,15 @@
     }
 
   /** Изображение @relative */
-    image(image, options = {point: Vector.zero}) {
+    image(image, options) {
+      options = {...defaultDrawImageOptions(image), ...options};
       options.point = this.pointer.addition(options.point);
       return this.IMAGE(image, options);
     }
 
   /** */
-    imageCenter(image, options = {}) {
+    imageCenter(image, options) {
+      options = {...defaultDrawImageOptions(image), ...options};
       options.point = this.pointer;
       return this.IMAGECENTER(image, options);
     }
@@ -270,19 +277,27 @@
       return this;
     }
 
-  /** Изображение @absolute */
+  /** Рисование изображения @absolute
+    * @param {Image} image рисуемое изображение
+    * @param {Vector} point стартовая точка холста-приемника
+    * @param {Vector} offset верхний левый угол фрагмента, который будет вырезан из изображения-источника
+    * @param {Vector} size размеры рисуемого изображения (масштабирование)
+    * @param {Vector} region размер фрагмента, который будет вырезан из изображения источника (либо до правого нижнего угла)
+    * @return {Context} this
+    */
     IMAGE(image, {
         point  = Vector.zero,
         offset = Vector.zero,
         size   = Vector.from(image.width, image.height),
         region = Vector.from(image.width, image.height)
       }) {
-      this.context.drawImage(image, offset.x, offset.y, region.x, region.y, point.x, point.y, size.x, size.y);
-      return this;
+        this.context.drawImage(image, offset.x, offset.y, region.x, region.y, point.x, point.y, size.x, size.y);
+        return this;
     }
 
   /** */
-    IMAGECENTER(image, options = {point: Vector.zero}) {
+    IMAGECENTER(image, options) {
+      options = {...defaultDrawImageOptions(image), ...options};
       options.point = options.point.addition(options.size.reverse().scale(0.5));
       return this.IMAGE(image, options);
     }
@@ -371,7 +386,7 @@
 
   /** Перенос центра координат @absolute */
     TRANSLATE(vector) {
-      const matrix = Matrix.translate(vector, 3);
+      const matrix = Matrix.translate(vector);
       this.trans(matrix).context.translate(vector.x, vector.y);
       return this;
     }
@@ -517,6 +532,14 @@
       return this.port(vector);
     }
 
+  /** Создание и инициализация холста @static @init @fabric
+    * @param {HTMLCanvasElement} canvas холст для рисования
+    * @return {Canvas} this
+    */
+    static init(canvas) {
+      return new Canvas(canvas).init();
+    }
+
   /** Нахождение точки в нарисованной области (текущая СК) @absolute */
     In(vector) {
       return this.inPath(this.origin(vector));
@@ -636,8 +659,8 @@
     }
 
   /** Содержимое всего канваса в формате DATA URI
-    * @param {string} [format='image/png']
-    * @param {number} [quality=1]
+    * @param {string} [format='image/png'] формат получаемого изображения
+    * @param {number} [quality=1] качество изображения
     * @return {string} data URI
     */
     data(format = 'image/png', quality = 1) {
@@ -645,16 +668,27 @@
     }
   }
 
-/** @section @common @private */
-const dictionary = {
-  fill  : 'fillStyle',
-  stroke: 'strokeStyle',
-  width : 'lineWidth',
-  cap   : 'lineCap',
-  join  : 'lineJoin',
-  text  : 'fillTextStyle',
-  base  : 'textBaseline',
-  align : 'textAlign',
-  comp  : 'globalCompositeOperation',
-  alpha : 'globalAlpha'
-}; // font, shadow@
+// #region [Private]
+  const dictionary = {
+    fill  : 'fillStyle',
+    stroke: 'strokeStyle',
+    width : 'lineWidth',
+    cap   : 'lineCap',
+    join  : 'lineJoin',
+    text  : 'fillTextStyle',
+    base  : 'textBaseline',
+    align : 'textAlign',
+    comp  : 'globalCompositeOperation',
+    alpha : 'globalAlpha'
+  }; // font, shadow@
+
+  /** */
+    function defaultDrawImageOptions(image) {
+      return {
+        point : Vector.zero,
+        offset: Vector.zero,
+        size  : Vector.from(image.width, image.height),
+        region: Vector.from(image.width, image.height)
+      };
+    }
+// #endregion

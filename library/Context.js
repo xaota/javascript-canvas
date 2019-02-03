@@ -1,5 +1,5 @@
 /** @section @imports */
-  import {Vector} from 'javascript-algebra';
+  import {Vector} from '/javascript-algebra/index.js';
 
 /** {Context} Общее рисование @class */
 export default class Context {
@@ -51,13 +51,13 @@ export default class Context {
     }
 
   /** Группа линий подряд @relative */
-    strip(points) {
+    lines(...points) {
       points.forEach(p => this.line(p));
       return this;
     }
 
   /** Группа линий подряд @absolute */
-    STRIP(points) {
+    LINES(...points) {
       points.forEach(p => this.context.lineTo(p.data[0], p.data[1])); // fast
       if (points.length) this.pointer = points.pop();
       return this;
@@ -86,16 +86,16 @@ export default class Context {
       return this;
     }
 
-  /** Многоугольник @relative */
-    poly(points) {
+  /** Многоугольник @relative (?) */
+    poly(...points) {
       const head = points[0], zero = this.pointer, ring = zero.addition(head);
-      return this.move(head).strip(points).LINE(ring).MOVE(zero);
+      return this.move(head).lines(...points.slice(1)).LINE(ring).MOVE(zero);
     }
 
   /** Многоугольник @absolute */
-    POLY(points) {
-      const c = this.pointer, n = points.length - 1;
-      return this.MOVE(points[n]).STRIP(points).MOVE(c);
+    POLY(...points) {
+      const c = this.pointer;
+      return this.MOVE(points[0]).LINES(...points.slice(1)).LINE(points[0]).MOVE(c);
     }
 
   /** Правильный многоугольник */
@@ -185,7 +185,7 @@ export default class Context {
     * @return {Canvas} this
     */
     reset() {
-      return this.MOVE(Vector.zero);
+      return this.zero();
     }
 
   /** Поднятие пера
@@ -194,5 +194,12 @@ export default class Context {
     end() {
       this.context.closePath();
       return this;
+    }
+
+  /** Возврат к нулевой точке
+    * @return {Canvas} this
+    */
+    zero() {
+      return this.MOVE(Vector.zero);
     }
   }
