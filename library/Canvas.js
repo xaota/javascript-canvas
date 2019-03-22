@@ -110,7 +110,7 @@
     }
 
   /** Перенос начала координат в центр холста @relative
-    * @return {Canvas} this
+    * @return {Canvas} @this
     */
     center() {
       return this.TO(this.CENTER);
@@ -181,7 +181,7 @@
     }
 
   /** Рисование контура
-    * @return {Canvas} this
+    * @return {Canvas} @this
     */
     stroke() {
       this.context.stroke();
@@ -207,7 +207,7 @@
     }
 
   /** Заливка
-    * @return {Canvas} this
+    * @return {Canvas} @this
     */
     fill() {
       this.context.fill();
@@ -230,6 +230,20 @@
     FILLPATH(path, color) {
       var last = this.decore.fill;
       return this.style({fill: color}).fillPath(path).style({fill: last});
+    }
+
+  /** Заливка цветом ВСЕГО холста
+    * @param {string} fill цвет заливки
+    * @return {Canvas} @this
+    */
+    fillCanvas(fill) {
+      const A = this.coord(Vector.zero);
+      const B = this.coord(this.SIZE);
+      this.save().begin()
+        .MOVE(A).RECT(B)
+        .style({fill}).fill()
+        .end().restore();
+      return this;
     }
 
   /** Изображение @relative */
@@ -348,30 +362,45 @@
       return this.context.getImageData(point.x, point.y, size.x, size.y);
     }
 
-  /** Ограничение области рисования */
+  /** Ограничение области рисования @relative / clip
+    * @param {string} [rule="nonzero"] алгоритм выбора положения точки в регионе рисования (nonzero / evenodd)
+    * @return {Canvas} @this
+    */
     clip(rule = 'nonzero') {
       this.context.clip(rule);
       return this;
     }
 
-  /** Ограничение области рисования по пути */
+  /** Ограничение области рисования по пути @absolute / CLIP
+    * @param {Path|Path2D} path регион ограничения области рисования
+    * @param {string} [rule="nonzero"] алгоритм выбора положения точки в регионе рисования (nonzero / evenodd)
+    * @return {Canvas} @this
+    */
     CLIP(path, rule = 'nonzero') {
       this.context.clip(path.context, rule);
+      return this;
     }
 
-  /** Очистка области экрана @absolute */
+  /** Очистка области экрана @absolute / clr
+    * @param {Vector} A координаты точки, из которой делать очистку
+    * @param {Vector} B координаты точки, до которой делать очистку
+    * @return {Canvas} @this
+    */
     clr(A, B) {
       this.context.clearRect(A.x, A.y, B.x, B.y);
       return this;
     }
 
-  /** Очистка области экрана @relative */
+  /** Очистка области экрана @relative / clear
+    * @param {Vector} vector координаты точки, до которой делать очистку
+    * @return {Canvas} @this
+    */
     clear(vector) {
       return this.clr(this.pointer, vector);
     }
 
-  /** Очистка всего холста
-    * @return {Canvas} this
+  /** Очистка всего холста / CLEAR
+    * @return {Canvas} @this
     */
     CLEAR() {
       const A = this.coord(Vector.zero);
@@ -647,6 +676,7 @@
       return this.STROKETEXT(string, this.pointer, width);
     }
 
+  /** */
     StrokeText(string, point, width) {
       point = this.pointer.addition(point);
       return this.STROKETEXT(string, point, width);

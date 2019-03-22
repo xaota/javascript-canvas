@@ -86,6 +86,15 @@ export default class Context {
       return this;
     }
 
+  /** Прямоугольник с центром в точке пера @relative
+    * @param {Vector} size размеры прямоугольника
+    * @return {Context} @this
+    */
+    rectangleCenter(size) {
+      const start = size.half().reverse();
+      return this.rectangle(start, size);
+    }
+
   /** Многоугольник @relative (?) */
     poly(...points) {
       const head = points[0], zero = this.pointer, ring = zero.addition(head);
