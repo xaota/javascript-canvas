@@ -55,7 +55,7 @@
       return this.VIEW.difference(this.pointer);
     }
 
-  /** Изменение размеров холста */
+  /** Изменение размеров холста / size */
     size(vector) {
       this.canvas.style.width  = vector.x + 'px';
       this.canvas.style.height = vector.y + 'px';
@@ -63,7 +63,7 @@
       return this;
     }
 
-  /** */
+  /** / view */
     view(vector) {
       this.context.canvas.width  = vector.x;
       this.context.canvas.height = vector.y;
@@ -71,7 +71,7 @@
       return this;
     }
 
-  /** Установка размеров холста и области рисования
+  /** Установка размеров холста и области рисования / port
     * @param {Vector} vector устанавливаемые размеры
     * @return {Canvas} this
     */
@@ -79,44 +79,41 @@
       return this.size(vector).view(vector);
     }
 
-  /** */
+  /** / hard */
     hard(vector) {
       return this.view(this.SIZE.multiplication(vector));
     }
 
-  /** Перевод абсолютных координат в координаты окружения пера */
+  /** Перевод абсолютных координат в координаты окружения пера / coord */
     coord(vector) { // AX = B => X = inverse(A) B
-      vector = vector.resize(3).fill(2, 1);
-      return this.matrix.inverse().vectorCol(vector).vector().resize(2);
+      return this.matrix.transitionInverse(vector.resize(3).fill(2, 1)).resize(2);
     }
 
-  /** Перевод координат из окружения пера в абсолютные (?) */
+  /** Перевод координат из окружения пера в абсолютные (?) / origin */
     origin(vector) { // AB = X
-      vector = vector.resize(3).fill(2, 1);
-      return this.matrix.vectorCol(vector).vector().resize(2);
+      return this.matrix.transition(vector.resize(3).fill(2, 1)).resize(2);
     }
 
-  /** Перевод точек из одной СК окружения пера в другую через матрицу перехода */
-    static trans(vector, matrix) {
-      vector = vector.resize(3).fill(2, 1);
-      return matrix.vectorCol(vector).vector().resize(2);
+  /** Перевод точек из одной СК окружения пера в другую через матрицу перехода / transition @static */
+    static transition(matrix, vector) {
+      return Matrix.transition(matrix, vector.resize(3).fill(2, 1)).resize(2);
     }
 
-  /** Преобразование СК с переносом пера */
-    trans(matrix) {
+  /** Преобразование СК с переносом пера / transition */
+    transition(matrix) {
       this.matrix = this.matrix.multiply(matrix);
-      // this.pointer = Canvas.trans(this.pointer, matrix);
+      // this.pointer = Canvas.transition(matrix, this.pointer);
       return this;
     }
 
-  /** Перенос начала координат в центр холста @relative
+  /** Перенос начала координат в центр холста / center @relative
     * @return {Canvas} @this
     */
     center() {
       return this.TO(this.CENTER);
     }
 
-  /** Перенос начала координат в центр холста @absolute
+  /** Перенос начала координат в центр холста / basis @absolute
     * @return {Canvas} this
     */
     basis() {
@@ -162,11 +159,7 @@
 
   /** Изменение стиля рисования */
     style(param) {
-      for (const i in param) {
-        if (param[i]) {
-          this.context[i in dictionary ? dictionary[i] : i] = param[i];
-        }
-      }
+      for (const i in param) if (param[i]) this.context[i in dictionary ? dictionary[i] : i] = param[i];
       Object.assign(this.decore, param);
       return this;
     }
@@ -180,7 +173,7 @@
       return this;
     }
 
-  /** Рисование контура
+  /** Рисование контура / stroke
     * @return {Canvas} @this
     */
     stroke() {
@@ -232,7 +225,7 @@
       return this.style({fill: color}).fillPath(path).style({fill: last});
     }
 
-  /** Заливка цветом ВСЕГО холста
+  /** Заливка цветом ВСЕГО холста / fillCanvas
     * @param {string} fill цвет заливки
     * @return {Canvas} @this
     */
@@ -416,7 +409,7 @@
   /** Перенос центра координат @absolute */
     TRANSLATE(vector) {
       const matrix = Matrix.translate(vector);
-      this.trans(matrix).context.translate(vector.x, vector.y);
+      this.transition(matrix).context.translate(vector.x, vector.y);
       return this;
     }
 
@@ -429,7 +422,7 @@
   /** Масштабирование @relative */
     scale(vector) {
       const matrix = Matrix.scale(vector, 3);
-      this.trans(matrix).context.scale(vector.x, vector.y);
+      this.transition(matrix).context.scale(vector.x, vector.y);
       return this;
     }
 
@@ -492,7 +485,7 @@
   /** Поворот @relative */
     rotate(angle) {
       const matrix = Matrix.rot(angle, 3);
-      this.trans(matrix).context.rotate(angle);
+      this.transition(matrix).context.rotate(angle);
       return this;
     }
 
@@ -517,7 +510,7 @@
   /** Трансформация @relative */
     transform(a, b, c, d, e, f) {
       const matrix = Matrix.transform2(a, b, c, d, e, f);
-      this.trans(matrix).context.transform(a, b, c, d, e, f);
+      this.transition(matrix).context.transform(a, b, c, d, e, f);
       return this;
     }
 
@@ -551,13 +544,13 @@
       return super.reset();
     }
 
-  /**
+  /** / init
     * @return {Canvas} this
     */
     init() {
       const width = this.context.canvas.width,
-         height = this.context.canvas.height,
-         vector = Vector.from(width, height);
+           height = this.context.canvas.height,
+           vector = Vector.from(width, height);
       return this.port(vector);
     }
 
@@ -712,7 +705,7 @@
     alpha : 'globalAlpha'
   }; // font, shadow@
 
-  /** */
+  /** / defaultDrawImageOptions */
     function defaultDrawImageOptions(image) {
       return {
         point : Vector.zero,

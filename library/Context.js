@@ -75,15 +75,32 @@ export default class Context {
       return this.rect(vector.difference(this.pointer));
     }
 
-  /** Прямоугольник @relative */
-    rectangle(A, B) {
-      return this.RECTANGLE(A.addition(this.pointer), B);
-    }
+  /** Прямоугольник c началом относительно текущей позиции пера @relative
+    * @param {Vector} A точка начала относительно пера (левый верхний угол в нормальном состоянии)
+    * @param {Vector} B размеры прямоугольника
+    * @return {Context} @this
+    */
+   offsetRect(A, B) {
+    return this.rectangle(A.addition(this.pointer), B);
+  }
 
-  /** Прямоугольник @absolute */
-    RECTANGLE(A, B) {
+  /** Прямоугольник @relative
+    * @param {Vector} A точка начала (левый верхний угол в нормальном состоянии)
+    * @param {Vector} B размеры прямоугольника
+    * @return {Context} @this
+    */
+   rectangle(A, B) {
       this.context.rect(A.x, A.y, B.x, B.y);
       return this;
+    }
+
+  /** Прямоугольник @absolute
+    * @param {Vector} A точка начала относительно пера (левый верхний угол в нормальном состоянии)
+    * @param {Vector} B точка окончания (правый нижний угол в нормальном состоянии)
+    * @return {Context} @this
+    */
+    RECTANGLE(A, B) {
+      return this.rectangle(A, B.difference(A));
     }
 
   /** Прямоугольник с центром в точке пера @relative
