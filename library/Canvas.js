@@ -340,7 +340,7 @@
       return this;
     }
 
-  /** Пиксельные данные объекта холста
+  /** Пиксельные данные объекта холста @relative
     * @param {Vector} [size=Vector.zero] размеры области
     * @param {Vector} [offset=Vector.zero] отступ области
     * @return {ImageData} данные
@@ -350,8 +350,12 @@
       return this.PIXELS(size, point);
     }
 
-  /** */
-    PIXELS(size = this.POINT, point = Vector.zero) {
+  /** Пиксельные данные объекта холста @absolute
+    * @param {Vector} [size=Vector.zero] размеры области
+    * @param {Vector} [point=Vector.zero] отступ области
+    * @return {ImageData} данные
+    */
+    PIXELS(size = this.VIEW, point = Vector.zero) {
       return this.context.getImageData(point.x, point.y, size.x, size.y);
     }
 
@@ -443,7 +447,7 @@
     }
 
   /** Перевороты
-    * @return {Canvas} this
+    * @return {Canvas} @this
     */
     flipX() { // горизонталь
       return this.scale(Vector.flipX);
@@ -647,13 +651,64 @@
       return this.context.measureText(string).width;
     }
 
-  /** Заливка текста @relative */
+  /** Высота символа в строке @private
+    * @param {string} string символ
+    * @param {string} font настройки шрифта
+    * @return {object} размерности высоты символа {size, top, bottom, height}
+    */
+    measureHeightChar(string, font) {
+      const c = new Canvas();
+      const height = parseFloat(font) * 2;
+      c.port(Vector.from(height * string.length, height));
+      c.style(this.decore);
+      c.style({font, base: 'bottom'});
+      c.move(Vector.from(0, height / 2));
+      c.fillText(string);
+      const bounds = c.bounds();
+      return {
+        size: bounds.size.y,
+        top: bounds.top, // || 0
+        bottom: bounds.bottom,
+        height
+      };
+    }
+
+  /** Высота строки
+    * @param {string} string символ
+    * @param {string} size настройки размера шрифта
+    * @return {object} размерности высоты символа {top, bottom, height}
+    */
+    measureHeight(string, size) {
+      const font = size ? size + 'px Arial' : this.decore.font;
+      const precision = Math.floor(parseFloat(font) * 0.05);
+      const chars = string.split('').map((c, i) => ({...this.measureHeightChar(c, font), index: i, char: c})).filter(e => e.size > 0);
+
+      const top    = chars.reduce((a, e) => a.some(c => Math.abs(c - e.top) <= precision) ? a : a.concat(e.top), []);
+      const bottom = chars.reduce((a, e) => a.some(c => Math.abs(c - e.bottom) <= precision) ? a : a.concat(e.bottom), []);
+      const height = chars.reduce((a, e) => a.some(c => Math.abs(c - e.size) <= precision) ? a : a.concat(e.size), []);
+      const maximum = Math.max(...height);
+
+      const diffBottom = Math.max(...bottom) - Math.min(...bottom);
+      const diffTop = Math.max(...top) - Math.min(...top);
+
+      return {
+        height: maximum,
+        bottom: diffBottom,
+        top: diffTop
+      };
+    }
+
+  /** Заливка текста @relative
+    * @param {string} string строка текста
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
     fillText(string, width) {
       return this.FILLTEXT(string, this.pointer, width);
     }
 
   /** */
-    FillText(string, point, width) {
+    offsetFillText(string, point, width) {
       point = this.pointer.addition(point);
       return this.FILLTEXT(string, point, width);
     }
@@ -664,20 +719,146 @@
       return this;
     }
 
-  /** Обвод текста @relative */
+  /** Заливка текста с выравниванием по центру
+    * @param {string} string строка текста
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    fillTextCenter(string, width = Infinity) {
+      const measure = this.measure(string);
+      width = Math.min(measure, width);
+      const point = this.pointer.addition(Vector.from(-width / 2, 0));
+      return this.FILLTEXT(string, point, width);
+    }
+
+  /** Заливка многострочного текста с выравниванием
+    * @param {...string} strings строки текста
+    * @param {number} lineheight высота строки
+    * @param {string} align выравнивание
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    fillTextMultiline(strings, lineheight, align = 'left', width = Infinity) {
+      switch (align) {
+        case 'left'  : return this.fillTextMultilineLeft(  strings, lineheight, width);
+        case 'right' : return this.fillTextMultilineRight( strings, lineheight, width);
+        case 'center': return this.fillTextMultilineCenter(strings, lineheight, width);
+        default: throw Error('выравнивание текста не установлено');
+      }
+    }
+
+  /** Заливка многострочного текста с выравниванием по левому краю
+    * @param {...string} strings строки текста
+    * @param {number} lineheight высота строки
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    fillTextMultilineLeft(strings, lineheight, width = Infinity) {
+      strings.forEach(s => this.fillText(s, width).move(Vector.from(0, lineheight)));
+      return this;
+    }
+
+  /** Заливка многострочного текста с выравниванием по правому краю
+    * @param {...string} strings строки текста
+    * @param {number} lineheight высота строки
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    fillTextMultilineRight(strings, lineheight, width = Infinity) { // ! TODO:
+      strings.forEach(s => this.fillText(s, width).move(Vector.from(0, lineheight)));
+      return this;
+    }
+
+  /** Заливка многострочного текста с выравниванием по центру
+    * @param {...string} strings строки текста
+    * @param {number} lineheight высота строки
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    fillTextMultilineCenter(strings, lineheight, width = Infinity) {
+      strings.forEach(s => this.fillTextCenter(s, width).move(Vector.from(0, lineheight)));
+      return this;
+    }
+
+  /** Обводка текста @relative
+    * @param {string} string строка текста
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
     strokeText(string, width) {
       return this.STROKETEXT(string, this.pointer, width);
     }
 
   /** */
-    StrokeText(string, point, width) {
+    offsetStrokeText(string, point, width) {
       point = this.pointer.addition(point);
       return this.STROKETEXT(string, point, width);
     }
 
-  /** Обвод текста @absolute */
+  /** Обводка текста @absolute */
     STROKETEXT(string, point, width) {
       this.context.strokeText(string, point.x, point.y, width);
+      return this;
+    }
+
+  /** Обводка текста с выравниванием по центру
+    * @param {string} string строка текста
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    strokeTextCenter(string, width = Infinity) {
+      const measure = this.measure(string);
+      width = Math.min(measure, width);
+      const point = this.pointer.addition(Vector.from(-width / 2, 0));
+      return this.STROKETEXT(string, point, width);
+    }
+
+  /** Обводка многострочного текста с выравниванием
+    * @param {...string} strings строки текста
+    * @param {number} lineheight высота строки
+    * @param {string} align выравнивание
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    strokeTextMultiline(strings, lineheight, align = 'left', width = Infinity) {
+      switch (align) {
+        case 'left'  : return this.strokeTextMultilineLeft(  strings, lineheight, width);
+        case 'right' : return this.strokeTextMultilineRight( strings, lineheight, width);
+        case 'center': return this.strokeTextMultilineCenter(strings, lineheight, width);
+        default: throw Error('выравнивание текста не установлено');
+      }
+    }
+
+  /** Обводка многострочного текста с выравниванием по левому краю
+    * @param {...string} strings строки текста
+    * @param {number} lineheight высота строки
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    strokeTextMultilineLeft(strings, lineheight, width = Infinity) {
+      strings.forEach(s => this.strokeText(s, width).move(Vector.from(0, lineheight)));
+      return this;
+    }
+
+  /** Обводка многострочного текста с выравниванием по правому краю
+    * @param {...string} strings строки текста
+    * @param {number} lineheight высота строки
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    strokeTextMultilineRight(strings, lineheight, width = Infinity) { // ! TODO:
+      strings.forEach(s => this.strokeText(s, width).move(Vector.from(0, lineheight)));
+      return this;
+    }
+
+  /** Обводка многострочного текста с выравниванием по центру
+    * @param {...string} strings строки текста
+    * @param {number} lineheight высота строки
+    * @param {number} width максимальная ширина текста
+    * @return {Canvas} @this
+    */
+    strokeTextMultilineCenter(strings, lineheight, width = Infinity) {
+      strings.forEach(s => this.strokeTextCenter(s, width).move(Vector.from(0, lineheight)));
       return this;
     }
 
@@ -687,7 +868,62 @@
     * @return {string} data URI
     */
     data(format = 'image/png', quality = 1) {
-      return this.canvas.toDataURL();
+      return this.canvas.toDataURL(format, quality);
+    }
+
+  /** Получение размеров непрозрачной части изображения (crop/trim) / bounds
+    * @return {object} объект с информацией о границах {left, right, top, bottom, offset, size}
+    */
+    bounds() {
+      const pixels = this.PIXELS(), l = pixels.data.length;
+      let i, x, y;
+      const W = this.canvas.width, H = this.canvas.height;
+      const bound = {
+        top: null,
+        left: null,
+        right: null,
+        bottom: null
+      };
+
+      for (i = 0; i < l; i += 4) {
+        if (pixels.data[i + 3] === 0) continue;
+
+        x = (i / 4) % W;
+        y = Math.floor((i / 4) / W); // ~~k - faster, but es-lint no-bitwise
+
+        if (bound.top === null) {
+          bound.top = y;
+        }
+
+        if (bound.left === null) {
+          bound.left = x;
+        } else if (x < bound.left) {
+          bound.left = x;
+        }
+
+        if (bound.right === null) {
+          bound.right = x;
+        } else if (bound.right < x) {
+          bound.right = x;
+        }
+
+        if (bound.bottom === null) {
+          bound.bottom = y;
+        } else if (bound.bottom < y) {
+          bound.bottom = y;
+        }
+      }
+
+      bound.right = W - bound.right;
+      bound.bottom = H - bound.bottom;
+      // console.log('bound', W, H, bound);
+      const width  = W - bound.right - bound.left;
+      const height = H - bound.bottom - bound.top;
+      return {
+        ...bound,
+        offset: Vector.from(bound.left, bound.top),
+        size  : Vector.from(width, height)
+      }
     }
   }
 

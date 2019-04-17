@@ -21,6 +21,36 @@ export default class Context {
       return this;
     }
 
+  /** move x */
+    x(shift) {
+      return this.move(Vector.from(shift, 0));
+    }
+
+  /** move y */
+    y(shift) {
+      return this.move(Vector.from(0, shift));
+    }
+
+  /** MOVE X */
+    X(coord) {
+      return this.MOVE(Vector.from(coord, 0));
+    }
+
+  /** MOVE Y */
+    Y(coord) {
+      return this.MOVE(Vector.from(0, coord));
+    }
+
+  /** */
+    to(x, y) {
+      return this.move(Vector.from(x, y));
+    }
+
+  /** */
+    TO(x, y) {
+      return this.MOVE(Vector.from(x, y));
+    }
+
   /** Перенос пера в угол @relative */
     nook(vertical = 'top', horisontal = 'right') {
       vertical   = vertical.toLowerCase() === 'top';
@@ -80,16 +110,16 @@ export default class Context {
     * @param {Vector} B размеры прямоугольника
     * @return {Context} @this
     */
-   offsetRect(A, B) {
-    return this.rectangle(A.addition(this.pointer), B);
-  }
+    offsetRect(A, B) {
+      return this.rectangle(A.addition(this.pointer), B);
+    }
 
   /** Прямоугольник @relative
     * @param {Vector} A точка начала (левый верхний угол в нормальном состоянии)
     * @param {Vector} B размеры прямоугольника
     * @return {Context} @this
     */
-   rectangle(A, B) {
+    rectangle(A, B) {
       this.context.rect(A.x, A.y, B.x, B.y);
       return this;
     }
