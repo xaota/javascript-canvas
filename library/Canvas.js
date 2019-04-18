@@ -679,6 +679,7 @@
     * @return {object} размерности высоты символа {top, bottom, height}
     */
     measureHeight(string, size) {
+      if (string.length === 0) return {height: size, top:0, bottom:0};
       const font = size ? size + 'px Arial' : this.decore.font;
       const precision = Math.floor(parseFloat(font) * 0.05);
       const chars = string.split('').map((c, i) => ({...this.measureHeightChar(c, font), index: i, char: c})).filter(e => e.size > 0);
