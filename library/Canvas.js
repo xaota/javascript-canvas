@@ -49,13 +49,16 @@
     }
 
   /** Положение пера относительно правого нижнего угла холста @readonly
-    * @return {Vector}
+    * @return {Vector} точка на холсте
     */
     get POINT() {
       return this.VIEW.difference(this.pointer);
     }
 
-  /** Изменение размеров холста / size */
+  /** Изменение размеров холста / size
+    * @param {Vector} vector новые размеры холста
+    * @return {Canvas} @this
+    */
     size(vector) {
       this.canvas.style.width  = vector.x + 'px';
       this.canvas.style.height = vector.y + 'px';
@@ -63,7 +66,10 @@
       return this;
     }
 
-  /** / view */
+  /** / view
+    * @param {Vector} vector новые размеры холста
+    * @return {Canvas} @this
+    */
     view(vector) {
       this.context.canvas.width  = vector.x;
       this.context.canvas.height = vector.y;
@@ -120,7 +126,10 @@
       return this.reset().center();
     }
 
-  /** Переход к новому базису */
+  /** Переход к новому базису
+    * @param {Matrix} matrix новый базис
+    * @return {Canvas} @this
+    */
     BASIS(matrix) {
       const A = matrix.col(0), B = matrix.col(1);
       return this.transform(A.x, B.x, A.y, B.y, 1, 1);
@@ -552,9 +561,9 @@
     * @return {Canvas} this
     */
     init() {
-      const width = this.context.canvas.width,
-           height = this.context.canvas.height,
-           vector = Vector.from(width, height);
+      const width  = this.context.canvas.width;
+      const height = this.context.canvas.height;
+      const vector = Vector.from(width, height);
       return this.port(vector);
     }
 
@@ -566,12 +575,18 @@
       return new Canvas(canvas).init();
     }
 
-  /** Нахождение точки в нарисованной области (текущая СК) @absolute */
+  /** Нахождение точки в нарисованной области (текущая СК) @absolute
+    * @param {Vector} vector координаты точки
+    * @return {Boolean} true, если точка лежит в области пути
+    */
     In(vector) {
       return this.inPath(this.origin(vector));
     }
 
-  /** Нахождение точки в нарисованной области (основная СК) @relative */
+  /** Нахождение точки в нарисованной области (основная СК) @relative
+    * @param {Vector} vector координаты точки
+    * @return {Boolean} true, если точка лежит в области пути
+    */
     in(vector) {
       return this.context.isPointInPath(vector.x, vector.y);
     }
@@ -651,7 +666,7 @@
       return this.context.measureText(string).width;
     }
 
-  /** Высота символа в строке @private
+  /** Высота символа в строке @private @beta
     * @param {string} string символ
     * @param {string} font настройки шрифта
     * @return {object} размерности высоты символа {size, top, bottom, height}
@@ -673,7 +688,7 @@
       };
     }
 
-  /** Высота строки
+  /** Высота строки @beta
     * @param {string} string символ
     * @param {string} size настройки размера шрифта
     * @return {object} размерности высоты символа {top, bottom, height}
@@ -870,6 +885,26 @@
     */
     data(format = 'image/png', quality = 1) {
       return this.canvas.toDataURL(format, quality);
+    }
+
+  /** Содержимое всего канваса в бинарном формате @async
+    * @param {string} [format='image/png'] формат получаемого изображения
+    * @param {number} [quality=1] качество изображения
+    * @return {Promise} {Blob}
+    */
+    blob(format = 'image/png', quality = 1) {
+      return new Promise(resolve => this.canvas.toBlob(blob => resolve(blob), format, quality));
+    }
+
+  /** Получение изображения из содержимого canvas / toImage
+    * @param {string} [format='image/png'] формат получаемого изображения
+    * @param {number} [quality=1] качество изображения
+    * @return {Image} изображение с содержимым canvas
+    */
+    toImage(format = 'image/png', quality = 1) {
+      const image = new Image();
+      image.src = this.data(format, quality);
+      return image;
     }
 
   /** Получение размеров непрозрачной части изображения (crop/trim) / bounds
