@@ -2,3 +2,5 @@
 .babelrc
 .vscode/
 node_modules/
+
+.history/

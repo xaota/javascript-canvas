@@ -227,13 +227,30 @@ export default class Context {
 
   /** Кубическая кривая Безье @relative */
     cubic(A, B, point) {
+      A = this.pointer.addition(A);
+      B = this.pointer.addition(A);
+      point = this.pointer.addition(point);
+      return this.CUBIC(A, B, point)
+    }
 
+  /** Кубическая кривая Безье @relative */
+    CUBIC(A, B, point) {
+      this.context.bezierCurveTo(A.x, A.y, B.x, B.y, point.x, point.y);
+      this.pointer = point;
       return this;
     }
 
   /** Квадратичная кривая Безье @relative */
     quadr(A, point) {
+      A = this.pointer.addition(A);
+      point = this.pointer.addition(point);
+      return this.QUADR(A, point);
+    }
 
+  /** */
+    QUADR(A, point) {
+      this.context.quadraticCurveTo(A.x, A.y, point.x, point.y);
+      this.pointer = point;
       return this;
     }
 
