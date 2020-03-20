@@ -8,7 +8,7 @@
   {
     "imports": {
       "javascript-algebra": "/javascript-algebra/index.js",
-      "javascript-algebra/": "/javascript-algebra/library/"
+      "javascript-algebra/": "/javascript-algebra/library/",
 
       "javascript-canvas": "/javascript-canvas/index.js",
       "javascript-canvas/": "/javascript-canvas/library/"
