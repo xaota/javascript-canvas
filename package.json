@@ -1,6 +1,6 @@
 {
   "name": "javascript-canvas",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Рисование с помощью Canvas API @2d",
   "main": "index.js",
   "type": "module",
