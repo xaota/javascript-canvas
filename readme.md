@@ -15,12 +15,14 @@
     }
   }
   </script>
+  <script src="./script.js" type="module"></script>
 </head>
 <body>
   <canvas></canvas>
 </body>
 ```
 
+> `./script.js`
 ```javascript
 import {Canvas, Path} from 'javascript-canvas';
 import {Vector}       from 'javascript-algebra';
@@ -88,4 +90,15 @@ context
   .end()
 ```
 
-### Примечания
+### Дополнительно
+Если вы используете vscode, можно настроить резолв для корректной работы самого редактора с помощью файла `jsconfig.json`
+```json
+{
+  "compilerOptions": {
+    "baseUrl": "../node_modules/",
+    "paths": {
+      "javascript-canvas/*": ["./javascript-canvas/library/*"]
+    }
+  }
+}
+```
