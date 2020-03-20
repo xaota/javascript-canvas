@@ -1,4 +1,4 @@
-/** @description @2d рисование для Canvas API [es6]
+/** @description @2D рисование для Canvas API [es6]
   * @author xaota
   * @required javascript-algebra {Vector, Matrix}
   */
