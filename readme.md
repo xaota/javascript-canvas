@@ -1,15 +1,29 @@
 Рисование для Canvas API [es6+] @2d
 
 ### Использование
+> importmaps
 ```html
+<head>
+  <script type="importmap">
+  {
+    "imports": {
+      "javascript-algebra": "/javascript-algebra/index.js",
+      "javascript-algebra/": "/javascript-algebra/library/"
+
+      "javascript-canvas": "/javascript-canvas/index.js",
+      "javascript-canvas/": "/javascript-canvas/library/"
+    }
+  }
+  </script>
+</head>
 <body>
   <canvas></canvas>
 </body>
 ```
 
 ```javascript
-import {Canvas, Path} from '/javascript-canvas/index.js';
-import {Vector}       from '/javascript-algebra/index.js';
+import {Canvas, Path} from 'javascript-canvas';
+import {Vector}       from 'javascript-algebra';
 
 const canvas = document.querySelector('canvas');
 
