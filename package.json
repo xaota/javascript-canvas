@@ -9,7 +9,12 @@
   "license": "Unlicense",
   "keywords": [
     "javascript",
-    "canvas"
+    "canvas",
+    "math",
+    "algebra",
+    "2d",
+    "graphics",
+    "primitive"
   ],
   "dependencies": {
     "javascript-algebra": "latest"
