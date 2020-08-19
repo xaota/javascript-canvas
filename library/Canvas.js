@@ -959,20 +959,6 @@ import Context          from './Context.js';
         size  : Vector.from(width, height)
       }
     }
-
-  /** */
-    static fps(context, callback) {
-      const start = performance.now();
-      requestAnimationFrame(frame);
-
-    /** */
-      function frame(timestamp) {
-        const time = timestamp - start;
-        const stop = callback(context, time);
-        if (stop === false) return;
-        requestAnimationFrame(frame);
-      }
-    }
   }
 
 // #region [Private]
