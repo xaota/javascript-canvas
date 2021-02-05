@@ -89,7 +89,7 @@ export default class Context {
   /** Группа линий подряд @absolute */
     LINES(...points) {
       points.forEach(p => this.context.lineTo(p.data[0], p.data[1])); // fast
-      if (points.length) this.pointer = points.pop();
+      if (points.length) this.pointer = points[points.length - 1].copy();
       return this;
     }
 
@@ -151,10 +151,19 @@ export default class Context {
   /** Многоугольник @absolute */
     POLY(...points) {
       const c = this.pointer;
-      return this.MOVE(points[0]).LINES(...points.slice(1)).LINE(points[0]).MOVE(c);
+      return this
+        .MOVE(points[0])
+        .LINES(...points.slice(1))
+        .LINE(points[0])
+        .MOVE(c);
     }
 
-  /** Правильный многоугольник */
+  /** Правильный многоугольник
+    * @param {natural} n количество углов, n > 2
+    * @param {number} raduis радиус описанной окружности
+    * @param {number} rotation угол изначального поворота многоугольника (в радианах)
+    * @return {Context} @this
+    */
     regularPoly(n, radius, rotation = 0) {
       const point = new Array(n), c = this.pointer;
       let i = 0, alpha, x, y;
@@ -164,7 +173,7 @@ export default class Context {
         y = c.y + radius * Math.sin(alpha);
         point[i] = Vector.from(x, y);
       }
-      return this.POLY(point);
+      return this.POLY(...point);
     }
 
   /** Правильный треугольник */
@@ -225,7 +234,13 @@ export default class Context {
       return this.ellipse(r, r);
     }
 
-  /** Кубическая кривая Безье @relative */
+  /** Кубическая кривая Безье
+    * @relative
+    * @param {Vector} A точка перегиба 1
+    * @param {Vector} B точка перегиба 2
+    * @param {Vector} point конечная точка
+    * @return {Context} @this контекст рисования
+    */
     cubic(A, B, point) {
       A = this.pointer.addition(A);
       B = this.pointer.addition(A);
@@ -233,21 +248,37 @@ export default class Context {
       return this.CUBIC(A, B, point)
     }
 
-  /** Кубическая кривая Безье @relative */
+  /** Кубическая кривая Безье
+    * @absolute
+    * @param {Vector} A точка перегиба 1
+    * @param {Vector} B точка перегиба 2
+    * @param {Vector} point конечная точка
+    * @return {Context} @this контекст рисования
+    */
     CUBIC(A, B, point) {
       this.context.bezierCurveTo(A.x, A.y, B.x, B.y, point.x, point.y);
       this.pointer = point;
       return this;
     }
 
-  /** Квадратичная кривая Безье @relative */
+  /** Квадратичная кривая Безье
+    * @relative
+    * @param {Vector} A точка перегиба 1
+    * @param {Vector} point конечная точка
+    * @return {Context} @this контекст рисования
+    */
     quadr(A, point) {
       A = this.pointer.addition(A);
       point = this.pointer.addition(point);
       return this.QUADR(A, point);
     }
 
-  /** */
+  /** Квадратичная кривая Безье
+    * @absolute
+    * @param {Vector} A точка перегиба 1
+    * @param {Vector} point конечная точка
+    * @return {Context} @this контекст рисования
+    */
     QUADR(A, point) {
       this.context.quadraticCurveTo(A.x, A.y, point.x, point.y);
       this.pointer = point;
@@ -274,5 +305,12 @@ export default class Context {
     */
     zero() {
       return this.MOVE(Vector.zero);
+    }
+
+    static wrap(context, render) {
+      context.begin().save().move(Vector.zero);
+      render();
+      // fill, stroke
+      context.restore().end();
     }
   }

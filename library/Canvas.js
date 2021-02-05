@@ -367,7 +367,7 @@ import Context          from './Context.js';
     }
 
   /** Ограничение области рисования @relative / clip
-    * @param {string} [rule="nonzero"] алгоритм выбора положения точки в регионе рисования (nonzero / evenodd)
+    * @param {"evenodd" | "nonzero"} [rule="nonzero"] алгоритм выбора положения точки в регионе рисования (nonzero / evenodd)
     * @return {Canvas} @this
     */
     clip(rule = 'nonzero') {
@@ -950,7 +950,6 @@ import Context          from './Context.js';
 
       bound.right = W - bound.right;
       bound.bottom = H - bound.bottom;
-      // console.log('bound', W, H, bound);
       const width  = W - bound.right - bound.left;
       const height = H - bound.bottom - bound.top;
       return {
