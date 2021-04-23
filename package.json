@@ -3,8 +3,16 @@
   "version": "1.0.8",
   "description": "Рисование с помощью Canvas API @2d",
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./": "./library/"
+  },
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "./node_modules/eslint/bin/eslint.js .",
+    "clear": "rm -rf node_modules package-lock.json"
+  },
   "author": "https://github.com/xaota",
   "license": "Unlicense",
   "keywords": [
@@ -20,8 +28,13 @@
     "javascript-algebra": "latest"
   },
   "devDependencies": {
-    "eslint": "^6.6.0",
-    "babel-eslint": "^10.0.3"
+    "@types/node": "^14.14.41",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.24.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1"
   },
   "homepage": "https://github.com/xaota/javascript-canvas#readme",
   "repository": {

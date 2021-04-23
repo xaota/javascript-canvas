@@ -3,6 +3,6 @@
   * @required javascript-algebra {Vector, Matrix}
   */
 
-  export {default as Canvas} from './library/Canvas.js';
-  export {default as Path}   from './library/Path.js';
-  export {default as Img}    from './library/Img.js';
+  export { default as Canvas } from './library/Canvas.js';
+  export { default as Path }   from './library/Path.js';
+  export { default as Img }    from './library/Img.js';

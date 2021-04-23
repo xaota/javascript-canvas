@@ -1,4 +1,4 @@
-import {Vector, Matrix} from 'javascript-algebra';
+import { Vector, Matrix } from 'javascript-algebra';
 import Context          from './Context.js';
 
 /** {Canvas} Рисование на холсте @export @class @default */
@@ -129,7 +129,7 @@ import Context          from './Context.js';
     * @return {Canvas} @this
     */
     BASIS(matrix) {
-      const A = matrix.col(0), B = matrix.col(1);
+      const A = matrix.col(0); const B = matrix.col(1);
       return this.transform(A.x, B.x, A.y, B.y, 1, 1);
     }
 
@@ -172,7 +172,7 @@ import Context          from './Context.js';
     }
 
   /** Работа с тенями */
-    shadow(color, {x = 0, y = 0, blur = 0}) {
+    shadow(color, { x = 0, y = 0, blur = 0 }) {
       this.context.shadowOffsetX = x;
       this.context.shadowOffsetY = y;
       this.context.shadowBlur    = blur;
@@ -190,8 +190,8 @@ import Context          from './Context.js';
 
   /** */
     STROKE(color) {
-      var last = this.decore.stroke;
-      return this.style({stroke: color}).stroke().style({stroke: last});
+      const last = this.decore.stroke;
+      return this.style({ stroke: color }).stroke().style({ stroke: last });
     }
 
   /** */
@@ -202,8 +202,8 @@ import Context          from './Context.js';
 
   /** */
     STROKEPATH(path, color) {
-      var last = this.decore.stroke;
-      return this.style({stroke: color}).strokePath(path).style({stroke: last});
+      const last = this.decore.stroke;
+      return this.style({ stroke: color }).strokePath(path).style({ stroke: last });
     }
 
   /** Заливка
@@ -216,8 +216,8 @@ import Context          from './Context.js';
 
   /** */
     FILL(color) {
-      var last = this.decore.fill;
-      return this.style({fill: color}).fill().style({fill: last});
+      const last = this.decore.fill;
+      return this.style({ fill: color }).fill().style({ fill: last });
     }
 
   /** */
@@ -228,8 +228,8 @@ import Context          from './Context.js';
 
   /** */
     FILLPATH(path, color) {
-      var last = this.decore.fill;
-      return this.style({fill: color}).fillPath(path).style({fill: last});
+      const last = this.decore.fill;
+      return this.style({ fill: color }).fillPath(path).style({ fill: last });
     }
 
   /** Заливка цветом ВСЕГО холста / fillCanvas
@@ -241,21 +241,21 @@ import Context          from './Context.js';
       const B = this.coord(this.SIZE);
       this.save().begin()
         .MOVE(A).RECT(B)
-        .style({fill}).fill()
+        .style({ fill }).fill()
         .end().restore();
       return this;
     }
 
   /** Изображение @relative */
     image(image, options) {
-      options = {...defaultDrawImageOptions(image), ...options};
+      options = { ...defaultDrawImageOptions(image), ...options };
       options.point = this.pointer.addition(options.point);
       return this.IMAGE(image, options);
     }
 
   /** */
     imageCenter(image, options) {
-      options = {...defaultDrawImageOptions(image), ...options};
+      options = { ...defaultDrawImageOptions(image), ...options };
       options.point = this.pointer;
       return this.IMAGECENTER(image, options);
     }
@@ -263,7 +263,7 @@ import Context          from './Context.js';
   /** */
     strip(images, point, next) {
       images.forEach(image => {
-        this.image(image, {point});
+        this.image(image, { point });
         point = next(point, Vector.from(image.width, image.height));
       });
       return this;
@@ -311,7 +311,7 @@ import Context          from './Context.js';
 
   /** */
     IMAGECENTER(image, options) {
-      options = {...defaultDrawImageOptions(image), ...options};
+      options = { ...defaultDrawImageOptions(image), ...options };
       options.point = options.point.addition(options.size.reverse().scale(0.5));
       return this.IMAGE(image, options);
     }
@@ -319,7 +319,7 @@ import Context          from './Context.js';
   /** */
     STRIP(images, point, next) {
       images.forEach(image => {
-        this.IMAGE(image, {point});
+        this.IMAGE(image, { point });
         point = next(point, Vector.from(image.width, image.height));
       });
       return this;
@@ -488,8 +488,8 @@ import Context          from './Context.js';
     * @return {Canvas} this
     */
     get skewVector() {
-      const x = this.matrix.get(1, 0),
-            y = this.matrix.get(0, 1);
+      const x = this.matrix.get(1, 0);
+            const y = this.matrix.get(0, 1);
       return Vector.from(x, y);
     }
 
@@ -528,7 +528,7 @@ import Context          from './Context.js';
   /** Трансформация @absolute */
     TRANSFORM(a, b, c, d, e, f) {
       if (!arguments.length) return this.TRANSFORM(1, 0, 0, 1, 0, 0);
-      const pointer = this.origin(this.pointer), last = this.stack.length - 1;
+      const pointer = this.origin(this.pointer); const last = this.stack.length - 1;
       this.stack[last] = this.matrix = Matrix.transform2(a, b, c, d, e, f);
       this.pointer = this.coord(pointer);
       this.context.setTransform(a, b, c, d, e, f);
@@ -621,8 +621,8 @@ import Context          from './Context.js';
 
   /** Радиальный градиент @relative */
     radial(radius, start, finish) {
-      const P = this.pointer,
-          grd = this.GrdRad(P, P, Vector.from(0, radius));
+      const P = this.pointer;
+          const grd = this.GrdRad(P, P, Vector.from(0, radius));
       grd.addColorStop(0, start);
       grd.addColorStop(1, finish);
       return grd;
@@ -656,7 +656,7 @@ import Context          from './Context.js';
 
   /** */
     GrdRad(A, B, R) {
-      return this.context.createRadialGradient(A.x,A.y,R.x, B.x,B.y,R.y);
+      return this.context.createRadialGradient(A.x, A.y, R.x, B.x, B.y, R.y);
     }
 
   /** Получает ширину строки */
@@ -674,7 +674,7 @@ import Context          from './Context.js';
       const height = parseFloat(font) * 2;
       c.port(Vector.from(height * string.length, height));
       c.style(this.decore);
-      c.style({font, base: 'bottom'});
+      c.style({ font, base: 'bottom' });
       c.move(Vector.from(0, height / 2));
       c.fillText(string);
       const bounds = c.bounds();
@@ -692,10 +692,10 @@ import Context          from './Context.js';
     * @return {object} размерности высоты символа {top, bottom, height}
     */
     measureHeight(string, size) {
-      if (string.length === 0) return {height: size, top:0, bottom:0};
+      if (string.length === 0) return { height: size, top:0, bottom:0 };
       const font = size ? size + 'px Arial' : this.decore.font;
       const precision = Math.floor(parseFloat(font) * 0.05);
-      const chars = string.split('').map((c, i) => ({...this.measureHeightChar(c, font), index: i, char: c})).filter(e => e.size > 0);
+      const chars = string.split('').map((c, i) => ({ ...this.measureHeightChar(c, font), index: i, char: c })).filter(e => e.size > 0);
 
       const top    = chars.reduce((a, e) => a.some(c => Math.abs(c - e.top) <= precision) ? a : a.concat(e.top), []);
       const bottom = chars.reduce((a, e) => a.some(c => Math.abs(c - e.bottom) <= precision) ? a : a.concat(e.bottom), []);
@@ -754,8 +754,8 @@ import Context          from './Context.js';
     */
     fillTextMultiline(strings, lineheight, align = 'left', width = Infinity) {
       switch (align) {
-        case 'left'  : return this.fillTextMultilineLeft(  strings, lineheight, width);
-        case 'right' : return this.fillTextMultilineRight( strings, lineheight, width);
+        case 'left'  : return this.fillTextMultilineLeft(strings, lineheight, width);
+        case 'right' : return this.fillTextMultilineRight(strings, lineheight, width);
         case 'center': return this.fillTextMultilineCenter(strings, lineheight, width);
         default: throw Error('выравнивание текста не установлено');
       }
@@ -836,8 +836,8 @@ import Context          from './Context.js';
     */
     strokeTextMultiline(strings, lineheight, align = 'left', width = Infinity) {
       switch (align) {
-        case 'left'  : return this.strokeTextMultilineLeft(  strings, lineheight, width);
-        case 'right' : return this.strokeTextMultilineRight( strings, lineheight, width);
+        case 'left'  : return this.strokeTextMultilineLeft(strings, lineheight, width);
+        case 'right' : return this.strokeTextMultilineRight(strings, lineheight, width);
         case 'center': return this.strokeTextMultilineCenter(strings, lineheight, width);
         default: throw Error('выравнивание текста не установлено');
       }
@@ -909,9 +909,9 @@ import Context          from './Context.js';
     * @return {object} объект с информацией о границах {left, right, top, bottom, offset, size}
     */
     bounds() {
-      const pixels = this.PIXELS(), l = pixels.data.length;
+      const pixels = this.PIXELS(); const l = pixels.data.length;
       let i, x, y;
-      const W = this.canvas.width, H = this.canvas.height;
+      const W = this.canvas.width; const H = this.canvas.height;
       const bound = {
         top: null,
         left: null,

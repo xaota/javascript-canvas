@@ -144,7 +144,7 @@ export default class Context {
 
   /** Многоугольник @relative (?) */
     poly(...points) {
-      const head = points[0], zero = this.pointer, ring = zero.addition(head);
+      const head = points[0]; const zero = this.pointer; const ring = zero.addition(head);
       return this.move(head).lines(...points.slice(1)).LINE(ring).MOVE(zero);
     }
 
@@ -165,8 +165,8 @@ export default class Context {
     * @return {Context} @this
     */
     regularPoly(n, radius, rotation = 0) {
-      const point = new Array(n), c = this.pointer;
-      let i = 0, alpha, x, y;
+      const point = new Array(n); const c = this.pointer;
+      let i = 0; let alpha; let x; let y;
       for (; i < n; ++i) {
         alpha = rotation + 2 * Math.PI * i / n;
         x = c.x + radius * Math.cos(alpha);
@@ -200,13 +200,11 @@ export default class Context {
 
   /** Угловая дуга @relative */
     arcTo(A, B, radius) {
-
       return this;
     }
 
   /** Угловая дуга @absolute */
     ARCTO(A, B, radius) {
-
       return this;
     }
 
