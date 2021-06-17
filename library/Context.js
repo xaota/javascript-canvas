@@ -1,5 +1,5 @@
 /** @section @imports */
-  import Vector from 'javascript-algebra/Vector.js';
+  import Vector from 'javascript-algebra/library/Vector.js';
 
 /** {Context} Общее рисование @class */
 export default class Context {

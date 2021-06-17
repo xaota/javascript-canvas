@@ -1,5 +1,6 @@
-import { Vector, Matrix } from 'javascript-algebra';
-import Context          from './Context.js';
+import Vector  from 'javascript-algebra/library/Vector.js';
+import Matrix  from 'javascript-algebra/library/Matrix.js';
+import Context from './Context.js';
 
 /** {Canvas} Рисование на холсте @export @class @default */
   export default class Canvas extends Context {
