@@ -99,15 +99,10 @@ import Context from './Context.js';
       return this.matrix.transition(vector.resize(3).fill(2, 1)).resize(2);
     }
 
-  /** Перевод точек из одной СК окружения пера в другую через матрицу перехода / transition @static */
-    static transition(matrix, vector) {
-      return Matrix.transition(matrix, vector.resize(3).fill(2, 1)).resize(2);
-    }
-
   /** Преобразование СК с переносом пера / transition */
     transition(matrix) {
       this.matrix = this.matrix.multiply(matrix);
-      // this.pointer = Canvas.transition(matrix, this.pointer);
+      // this.pointer = Matrix.transition2D(matrix, this.pointer);
       return this;
     }
 
@@ -490,7 +485,7 @@ import Context from './Context.js';
     */
     get skewVector() {
       const x = this.matrix.get(1, 0);
-            const y = this.matrix.get(0, 1);
+      const y = this.matrix.get(0, 1);
       return Vector.from(x, y);
     }
 
@@ -533,6 +528,21 @@ import Context from './Context.js';
       this.stack[last] = this.matrix = Matrix.transform2(a, b, c, d, e, f);
       this.pointer = this.coord(pointer);
       this.context.setTransform(a, b, c, d, e, f);
+      return this;
+    }
+
+  /** Переход в изометрическую проекцию / isometric @2D
+    * @param {number} iso коэффициент изометрии (обычно 1.43 или 2.0)
+    * @param {Vector} offset сдвиг
+    * @return {Canvas} this
+    */
+    isometric(iso, offset = Vector.zero) {
+      const matrix = Matrix.isometric(iso, offset);
+      const a = matrix.get(0, 0);
+      const b = matrix.get(0, 1);
+      const c = matrix.get(1, 0);
+      const d = matrix.get(1, 1);
+      this.transition(matrix).context.transform(a, b, c, d, offset.x, offset.y);
       return this;
     }
 
